@@ -20,7 +20,7 @@ let server = app.listen(8081, function () {
    var host = server.address().address
    var port = server.address().port
    
-   console.log("Example app listening at http://%s:%s", host, port)
+   console.log("Back-end app listening at http://%s:%s", host, port)
 })
 // Set static file location for production
 // app.use(express.static(__dirname + '/public'));
@@ -32,7 +32,7 @@ app.use(logger('dev')); // Log requests to API using morgan
 
 // Enable CORS from client-side
 app.use((req, res, next) => {
-  var allowedOrigins = ['http://localhost:8080', 'http://localhost:3001', 'http://178.128.73.230:3001', 'http://178.128.73.230:9001', 'http://178.128.73.230:8080'];
+  var allowedOrigins = ['http://localhost:8080', 'http://localhost:3001'];
   var origin = req.headers.origin;
   console.log("origin: " + origin);
   if(allowedOrigins.indexOf(origin) > -1){
