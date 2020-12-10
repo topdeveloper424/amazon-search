@@ -1,4 +1,4 @@
-# adopt-pets
+# Amazon Data Importer
 
 ## Project setup
 ```
