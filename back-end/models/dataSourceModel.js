@@ -2,17 +2,17 @@
 // Model for data source
 //= =======================================
 
-import * as mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-export const DataSource = new Schema({
+const DataSourceSchema = new Schema({
     searchTerm: {
         type: String,
         default: ''
     },
     rank: {
-        type: Number,
+        type: String,
         default: ''
     },
     asin1: {
@@ -64,3 +64,7 @@ export const DataSource = new Schema({
         default: ''
     }
 });
+
+module.exports = {
+    DataSourceSchema : DataSourceSchema
+}

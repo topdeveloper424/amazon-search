@@ -32,7 +32,7 @@
         <upload-file-component />
       </b-col>
     </b-row>    
-    <b-row class="mt-3">
+    <b-row class="mt-3 mb-3">
       <b-col>
         <data-view-component />
       </b-col>

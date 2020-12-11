@@ -2,11 +2,11 @@
 // Model for save search
 //= =======================================
 
-import * as mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-export const SavedSearch = new Schema({
+exports.SavedSearch = new Schema({
     searchTerms: {
         type: Boolean,
         default: true

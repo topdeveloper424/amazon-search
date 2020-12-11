@@ -1,9 +1,10 @@
-module.exports = Conf = {
+module.exports  = {
     // Remote monogodb url
-    mongoURL: 'mongodb://localhost:27017/amazon_data',
+//    mongoURL: "mongodb+srv://Serverusr1:<password>@cluster0.gbgc3.azure.mongodb.net/<dbname>?retryWrites=true&w=majority",
+    mongoURL: 'mongodb://localhost:27017/amazon_db',
  
     // Request limit number
-    requestMaxNum: 1000,
+    batchNumber: 500,
 
     // Maximum request number for signup
     requestMaxSignupNum: 3
