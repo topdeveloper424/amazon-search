@@ -64,6 +64,7 @@ exports.uploadFile = function (req, res, next) {
                     let tempList = [...modelList]
                     DataSource.insertMany(tempList).then(function(){
                         console.log('Added '+tempList.length + ' records...')
+                        tempList = null
                     })
                     batchCount = 0
                     modelList = []
@@ -76,6 +77,7 @@ exports.uploadFile = function (req, res, next) {
                 if(batchCount > 0){
                     DataSource.insertMany(modelList).then(()=>{
                         console.log('Added '+batchCount + ' records...')
+                        modelList = null
                     })
         
                 }
@@ -93,5 +95,24 @@ exports.uploadFile = function (req, res, next) {
 
 
     });
+
+};
+
+exports.getData = async function (req, res, next) {
+    console.log('connecting...');
+    const {page = 1, limit = 10} = req.query;
+    try{
+        const datasources = await DataSource.find().limit(limit * 1).skip((page - 1) * limit).exec()
+        const count = await datasources.countDocuments();
+        res.json({
+            datasources,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page
+          });    
+    
+    }catch (err){
+        console.log(err);
+    }
+
 
 };

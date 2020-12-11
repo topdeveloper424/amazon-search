@@ -62,6 +62,10 @@ const DataSourceSchema = new Schema({
     conv3: {
         type: String,
         default: ''
+    },
+    createdAt: {
+        type : Date,
+        default: Date.now  
     }
 });
 

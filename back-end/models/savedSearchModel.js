@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-exports.SavedSearch = new Schema({
+const SavedSearchSchema = new Schema({
     searchTerms: {
         type: Boolean,
         default: true
@@ -25,3 +25,7 @@ exports.SavedSearch = new Schema({
     }
 
 });
+
+module.exports = {
+    SavedSearchSchema : SavedSearchSchema
+}
