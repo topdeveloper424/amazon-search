@@ -25,9 +25,9 @@
 
       <b-col sm="7" md="6" offset-md="2" class="my-1">
         <b-pagination
-          v-model="currentPage"
-          :total-rows="totalRows"
-          :per-page="perPage"
+          v-model="tableData.page"
+          :total-rows="tableData.docs.length"
+          :per-page="tableData.limit"
           align="fill"
           size="sm"
           class="my-0"
@@ -36,14 +36,14 @@
     </b-row>
 
     <!-- Main table element -->
-    <b-table
+    <b-table v-if="tableData != null"
       show-empty
       small
       stacked="md"
-      :items="items"
+      :items="tableData.docs"
       :fields="fields"
-      :current-page="currentPage"
-      :per-page="perPage"
+      :current-page="tableData.page"
+      :per-page="tableData.limit"
       :filter="filter"
       :filter-included-fields="filterOn"
       :sort-by.sync="sortBy"
@@ -54,7 +54,6 @@
       <template #cell(name)="row">
         {{ row.value.first }} {{ row.value.last }}
       </template>
-
       <template #cell(actions)="row">
         <b-button size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1">
           Info modal
@@ -79,30 +78,22 @@
     </b-modal>
   </b-container>
 </template>
-
+<style>
+td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 1px;
+}
+</style>
 <script>
+import { mapGetters } from 'vuex'
+
   export default {
     name:'Dataview',
     data() {
       return {
-        items: [
-          { searchTerm: "bed", rank: 26, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "air bed", rank: 23, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "bed", rank: 26, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "air bed", rank: 23, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "bed", rank: 26, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "air bed", rank: 23, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "bed", rank: 26, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "air bed", rank: 23, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "bed", rank: 26, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "air bed", rank: 23, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "bed", rank: 26, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "air bed", rank: 23, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "bed", rank: 26, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "air bed", rank: 23, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "bed", rank: 26, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-          { searchTerm: "air bed", rank: 23, asin1: "B125013", title1:"King", share1: "32.43%", conv1:"14.2%", asin2: "B125013", title2:"King", share2: "32.43%", conv2:"14.2%",asin3: "B125013", title3:"King", share3: "32.43%", conv3:"14.2%"},
-        ],
+        tableData:null,
         fields: [
           { key: 'searchTerm', label: 'Search Term', sortable: true, sortDirection: 'desc' },
           { key: 'rank', label: 'Rank', sortable: true, class: 'text-center' },
@@ -135,11 +126,14 @@
         }
       }
     },
-    mounted() {
-      // Set the initial number of items
-      this.totalRows = this.items.length
+    mounted()  {
+      this.getTableData()
     },
     methods: {
+      getTableData :async function(){
+        let result= await this.$store.getters.getPageData
+        this.tableData = result.data
+      },
       info(item, index, button) {
         this.infoModal.title = `Row index: ${index}`
         this.infoModal.content = JSON.stringify(item, null, 2)
@@ -151,7 +145,6 @@
       },
       onFiltered(filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
-        this.totalRows = filteredItems.length
         this.currentPage = 1
       }
     }

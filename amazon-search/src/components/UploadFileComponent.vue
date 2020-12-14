@@ -3,7 +3,8 @@
     <div class="upload-file">
         <p>Data Current to: November, 22 2020</p>
         <p>Historical Dates missing: Sept 1-7 2020, Sept 15-23 2020, Oct 1-7 2020</p>
-        <p>Last Upload: November, 25 2020 3:23PM PST</p>
+
+        <p v-if="lastHistories.length > 0">Last Upload: {{lastHistories[lastHistories.length - 1].recordNumber}} records - {{lastHistories[lastHistories.length - 1].uploadedTime}}</p>
         <b-row>
           <b-col>
             <input id="fileUpload" type="file" accept=".xlsx, .xls, .csv" @change="uploadFile" hidden>
@@ -11,7 +12,7 @@
           </b-col>
         </b-row>
         
-        <b-row class="mt-4">
+        <b-row class="mt-4" v-if="status != ''">
           <b-col cols="3">{{status}}</b-col>
           <b-col cols="6">
             <b-progress :value="value" :max="max" show-progress animated></b-progress>
@@ -26,6 +27,8 @@
 
 <script>
 import axios from "axios";
+import {Conf} from './../../config'
+import { mapState } from 'vuex'
 
 export default {
   name: 'UploadFile',
@@ -38,8 +41,17 @@ export default {
 
     }
   },
+  computed: {
+      ...mapState([
+          'lastHistories'
+      ])
+  },
+  mounted() {
+    this.$store.dispatch('storeHistory')
+  },  
   methods: {
     chooseFiles: function() {
+          this.status = ""
           document.getElementById("fileUpload").click()
     },    
     cancelUpload :function(){
@@ -60,7 +72,7 @@ export default {
       const formData = new FormData();
       formData.append("file", event.target.files[0]);
       axios
-      .post("http://localhost:8081/api/uploadFile", formData, {
+      .post(Conf.serverURL+"data/uploadFile", formData, {
           headers: {
                   'Content-Type': 'multipart/form-data'
               },
@@ -69,13 +81,11 @@ export default {
         })
       .then(res => {
           console.log(res);
-          this.status = "uploaded"
+          this.status = "finished"
         })
         .catch(err => {
           console.log(err);
         });
-
-
     },
   }
 }

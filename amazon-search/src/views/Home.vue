@@ -45,7 +45,7 @@
 </style>
 
 <script>
-import {mapActions} from 'vuex'
+import { mapState } from 'vuex'
 import DataViewComponent from '../components/DataViewComponent.vue'
 import SaveSearchComponent from '../components/SaveSearchComponent.vue'
 import UploadFileComponent from '../components/UploadFileComponent.vue'
@@ -58,6 +58,7 @@ export default {
 
     }
   },
-  methods: {}
+  methods: {
+  }
 }
 </script>

@@ -1,5 +1,7 @@
+import { types } from './mutation-types'
+
 export default {
-    appendPet: (state, { species, pet }) => {
-        state[species].push(pet)
+    [types.SAVE_LAST_HISTORY](state, payload) {
+        state.lastHistories.push(payload)
     }
 }

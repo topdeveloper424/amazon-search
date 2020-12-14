@@ -8,8 +8,8 @@ const Schema = mongoose.Schema;
 
 const HistorySchema = new Schema({
     uploadedTime: {
-        type: String,
-        default: ''
+        type : Date,
+        default: Date.now  
     },
     recordNumber: {
         type: Number,

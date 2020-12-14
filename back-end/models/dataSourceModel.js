@@ -3,7 +3,6 @@
 //= =======================================
 
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 
 const DataSourceSchema = new Schema({
@@ -63,7 +62,7 @@ const DataSourceSchema = new Schema({
         type: String,
         default: ''
     },
-    createdAt: {
+    created_at: {
         type : Date,
         default: Date.now  
     }

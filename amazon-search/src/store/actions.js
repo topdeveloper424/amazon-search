@@ -1,5 +1,15 @@
+import { types } from './mutation-types'
+import {Conf} from './../../config'
+import axios from 'axios'
+
 export default {
-    addPet: ({ commit }, payload) => {
-        commit('appendPet', payload)
+
+    async storeHistory({ commit }, payload) {
+        try {
+            const { data } = await axios.get(Conf.serverURL + 'history/getLastHistory')
+            commit(types.SAVE_LAST_HISTORY, data)
+        } catch (e) {
+        }
     }
+
 }

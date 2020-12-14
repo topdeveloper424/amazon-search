@@ -5,12 +5,17 @@
 //= =======================================
 const mongoose = require('mongoose');
 const DataSourceSchema = require('./../models/dataSourceModel').DataSourceSchema
+const HistorySchema = require('./../models/historyModel').HistorySchema
 const path = require('path')
 const fs = require('fs')
 const csv = require('csv-parser');
 const busboy = require('connect-busboy');
-const DataSource = mongoose.model('DataSource', DataSourceSchema);
 const batchNumber = require("./../config").batchNumber
+const mongoosePaginate = require('mongoose-paginate-v2');
+
+DataSourceSchema.plugin(mongoosePaginate)
+const DataSource = mongoose.model('DataSource', DataSourceSchema);
+const History = mongoose.model('History', HistorySchema);
 
 exports.uploadFile = function (req, res, next) {
     req.pipe(req.busboy); // Pipe it trough busboy
@@ -31,6 +36,7 @@ exports.uploadFile = function (req, res, next) {
         // On finish of the upload
         var modelList = []
         var batchCount = 0
+        var totalCount = 0
         fstream.on('close', () => {
             console.log(`Upload of '${filename}' finished`);
             res.sendStatus(200);
@@ -56,6 +62,7 @@ exports.uploadFile = function (req, res, next) {
 
                 modelList.push(data)        // prepare for  bulk insert
                 batchCount ++
+                totalCount ++
                 console.log("batchCount",batchCount)
 
 
@@ -81,6 +88,8 @@ exports.uploadFile = function (req, res, next) {
                     })
         
                 }
+                let history = new History({recordNumber: totalCount})
+                history.save();
 
                 // remove file after insert data
                 try {
@@ -89,7 +98,8 @@ exports.uploadFile = function (req, res, next) {
                   } catch(err) {
                     console.error(err)
                   }                
-              console.log('CSV file successfully processed');
+        
+                  console.log('CSV file successfully processed');
             });
         });
 
@@ -102,13 +112,13 @@ exports.getData = async function (req, res, next) {
     console.log('connecting...');
     const {page = 1, limit = 10} = req.query;
     try{
-        const datasources = await DataSource.find().limit(limit * 1).skip((page - 1) * limit).exec()
-        const count = await datasources.countDocuments();
-        res.json({
-            datasources,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page
-          });    
+        DataSource.paginate({}, { offset: page, limit: limit }).then(result =>{
+            console.log(result.totalDocs)
+            res.end(JSON.stringify(result));    
+    
+        })
+        // const datasources = await DataSource.find().limit(limit * 1).skip((page - 1) * limit).exec()
+        // const count = await datasources.countDocuments();
     
     }catch (err){
         console.log(err);
