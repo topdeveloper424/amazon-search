@@ -6,8 +6,10 @@ export default {
 
     async storeHistory({ commit }, payload) {
         try {
-            const { data } = await axios.get(Conf.serverURL + 'history/getLastHistory')
-            commit(types.SAVE_LAST_HISTORY, data)
+            const {data} = await axios.get(Conf.serverURL + 'history/getLastHistory')
+            if(data){
+                commit(types.SAVE_LAST_HISTORY, data)
+            }
         } catch (e) {
         }
     }

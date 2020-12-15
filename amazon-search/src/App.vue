@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <b-container fluid="xl">
+    <b-container fluid>
       <router-view/>
     </b-container>
   </div>

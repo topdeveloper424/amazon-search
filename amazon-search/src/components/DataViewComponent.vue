@@ -1,152 +1,145 @@
 <template>
-  <b-container fluid>
-    <!-- User Interface controls -->
-    <b-row>
+	<div>
+    <vuetable-pagination ref="pagination"
+      :css="css.pagination"
+      @vuetable-pagination:change-page="onChangePage"
+    ></vuetable-pagination>
 
-      <b-col sm="4" md="4" class="my-1">
-        <b-form-group
-          label="Per page"
-          label-cols-sm="6"
-          label-cols-md="4"
-          label-cols-lg="3"
-          label-align-sm="right"
-          label-size="sm"
-          label-for="perPageSelect"
-          class="mb-0"
-        >
-          <b-form-select
-            v-model="perPage"
-            id="perPageSelect"
-            size="sm"
-            :options="pageOptions"
-          ></b-form-select>
-        </b-form-group>
-      </b-col>
-
-      <b-col sm="7" md="6" offset-md="2" class="my-1">
-        <b-pagination
-          v-model="tableData.page"
-          :total-rows="tableData.docs.length"
-          :per-page="tableData.limit"
-          align="fill"
-          size="sm"
-          class="my-0"
-        ></b-pagination>
-      </b-col>
-    </b-row>
-
-    <!-- Main table element -->
-    <b-table v-if="tableData != null"
-      show-empty
-      small
-      stacked="md"
-      :items="tableData.docs"
-      :fields="fields"
-      :current-page="tableData.page"
-      :per-page="tableData.limit"
-      :filter="filter"
-      :filter-included-fields="filterOn"
-      :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
-      :sort-direction="sortDirection"
-      @filtered="onFiltered"
-    >
-      <template #cell(name)="row">
-        {{ row.value.first }} {{ row.value.last }}
-      </template>
-      <template #cell(actions)="row">
-        <b-button size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1">
-          Info modal
-        </b-button>
-        <b-button size="sm" @click="row.toggleDetails">
-          {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
-        </b-button>
+  <vuetable ref="vuetable"
+    :api-url="serverURL+'data/getData?searchTerm='+searchTerm"
+    :fields="fields"
+    :sort-order="sortOrder"
+    :css="css.table"
+    pagination-path="pagination"
+    :per-page="10"
+    @vuetable:pagination-data="onPaginationData"
+    @vuetable:loading="onLoading"        
+    @vuetable:loaded="onLoaded"
+  >
+    <template slot="actions" slot-scope="props">
+      <div class="table-button-container">
+          <button class="btn btn-warning btn-sm" @click="editRow(props.rowData)">
+            <span class="glyphicon glyphicon-pencil"></span> Edit</button>&nbsp;&nbsp;
+      </div>
       </template>
 
-      <template #row-details="row">
-        <b-card>
-          <ul>
-            <li v-for="(value, key) in row.item" :key="key">{{ key }}: {{ value }}</li>
-          </ul>
-        </b-card>
-      </template>
-    </b-table>
+    </vuetable>
 
-    <!-- Info modal -->
-    <b-modal :id="infoModal.id" :title="infoModal.title" ok-only @hide="resetInfoModal">
-      <pre>{{ infoModal.content }}</pre>
-    </b-modal>
-  </b-container>
+	</div>
 </template>
-<style>
-td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 1px;
-}
-</style>
-<script>
-import { mapGetters } from 'vuex'
 
-  export default {
-    name:'Dataview',
-    data() {
-      return {
-        tableData:null,
-        fields: [
-          { key: 'searchTerm', label: 'Search Term', sortable: true, sortDirection: 'desc' },
-          { key: 'rank', label: 'Rank', sortable: true, class: 'text-center' },
-          { key: 'asin1', label: 'ASIN #1', sortable: true, sortDirection: 'desc' },
-          { key: 'title1', label: 'Title', sortable: true, class: 'text-center' },
-          { key: 'share1', label: 'Share', sortable: true, class: 'text-center' },
-          { key: 'conv1', label: 'Conv', sortable: true, class: 'text-center' },
-          { key: 'asin2', label: 'ASIN #2', sortable: true, sortDirection: 'desc' },
-          { key: 'title2', label: 'Title', sortable: true, class: 'text-center' },
-          { key: 'share2', label: 'Share', sortable: true, class: 'text-center' },
-          { key: 'conv2', label: 'Conv', sortable: true, class: 'text-center' },
-          { key: 'asin3', label: 'ASIN #3', sortable: true, sortDirection: 'desc' },
-          { key: 'title3', label: 'Title', sortable: true, class: 'text-center' },
-          { key: 'share3', label: 'Share', sortable: true, class: 'text-center' },
-          { key: 'conv3', label: 'Conv', sortable: true, class: 'text-center' }
+<script>
+import Vuetable from "vuetable-2";
+import VuetablePagination from "vuetable-2/src/components/VuetablePagination";
+import axios from "axios";
+import _ from "lodash";
+import {Conf} from './../../config'
+
+export default {
+  name:'DataView',
+  components: {
+    Vuetable,
+    VuetablePagination
+  },
+  props:{
+    searchTerm: String
+
+  },
+
+  data() {
+    return {
+      serverURL:Conf.serverURL,
+      fields: [
+          { name: 'searchTerm', title: 'Search Term',sortField:'searchTerm', titleClass: 'center aligned' },
+          { name: 'rank', title: 'Rank', sortField:'Rank', titleClass: 'center aligned'},
+          { name: 'asin1', title: 'ASIN #1', sortField:'asin1', titleClass: 'center aligned'},
+          { name: 'title1', title: 'Title', sortField:'title1', titleClass: 'center aligned'},
+          { name: 'share1', title: 'Share', sortField:'share1', titleClass: 'center aligned'},
+          { name: 'conv1', title: 'Conv', sortField:'conv1', titleClass: 'center aligned'},
+          { name: 'asin2', title: 'ASIN #2', sortField:'asin2', titleClass: 'center aligned'},
+          { name: 'title2', title: 'Title', sortField:'title2', titleClass: 'center aligned'},
+          { name: 'share2', title: 'Share', sortField:'share2', titleClass: 'center aligned'},
+          { name: 'conv2', title: 'Conv', sortField:'conv2', titleClass: 'center aligned'},
+          { name: 'asin3', title: 'ASIN #3', sortField:'asin3', titleClass: 'center aligned'},
+          { name: 'title3', title: 'Title', sortField:'title3', titleClass: 'center aligned'},
+          { name: 'share3', title: 'Share', sortField:'share3', titleClass: 'center aligned'},
+          { name: 'conv3', title: 'Conv', sortField:'conv3', titleClass: 'center aligned'},
+          '__slot:actions'
         ],
-        totalRows: 1,
-        currentPage: 1,
-        perPage: 5,
-        pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
-        sortBy: '',
-        sortDesc: false,
-        sortDirection: 'asc',
-        filter: null,
-        filterOn: [],
-        infoModal: {
-          id: 'info-modal',
-          title: '',
-          content: ''
-        }
+    sortOrder: [
+      { field: 'created_at', direction: 'asc'}
+    ],
+    css: {
+      table: {
+        tableClass: 'table table-striped table-bordered table-hovered',
+        loadingClass: 'loading',
+        ascendingIcon: 'glyphicon glyphicon-chevron-up',
+        descendingIcon: 'glyphicon glyphicon-chevron-down',
+        handleIcon: 'glyphicon glyphicon-menu-hamburger',
+      },
+      pagination: {
+        infoClass: 'pull-left',
+        wrapperClass: 'vuetable-pagination pull-right',
+        activeClass: 'btn-primary',
+        disabledClass: 'disabled',
+        pageClass: 'btn btn-border',
+        linkClass: 'btn btn-border',
+        icons: {
+          first: '',
+          prev: '',
+          next: '',
+          last: '',
+        },
       }
+    }        
+    };
+  },
+  mounted(){
+    this.serverURL = Conf.serverURL;
+    console.log(this.searchTerm)
+
+  },
+computed:{
+  /*httpOptions(){
+    return {headers: {'Authorization': "my-token"}} //table props -> :http-options="httpOptions"
+  },*/
+ },
+ methods: {
+    onPaginationData (paginationData) {
+      this.$refs.pagination.setPaginationData(paginationData)
     },
-    mounted()  {
-      this.getTableData()
+    onChangePage (page) {
+      this.$refs.vuetable.changePage(page)
     },
-    methods: {
-      getTableData :async function(){
-        let result= await this.$store.getters.getPageData
-        this.tableData = result.data
-      },
-      info(item, index, button) {
-        this.infoModal.title = `Row index: ${index}`
-        this.infoModal.content = JSON.stringify(item, null, 2)
-        this.$root.$emit('bv::show::modal', this.infoModal.id, button)
-      },
-      resetInfoModal() {
-        this.infoModal.title = ''
-        this.infoModal.content = ''
-      },
-      onFiltered(filteredItems) {
-        // Trigger pagination to update the number of buttons/pages due to filtering
-        this.currentPage = 1
-      }
+    editRow(rowData){
+      alert("You clicked edit on"+ JSON.stringify(rowData))
+    },
+    deleteRow(rowData){
+      alert("You clicked delete on"+ JSON.stringify(rowData))
+    },
+    onLoading() {
+      console.log('loading... show your spinner here')
+    },
+    onLoaded() {
+      console.log('loaded! .. hide your spinner here')
     }
   }
+};
 </script>
+
+<style>
+.vuetable-pagination{
+  float: right;
+}
+.vuetable {
+  font-size: 12px;
+}
+.orange.glyphicon {
+  color: orange;
+}
+
+th.sortable {
+  color: #ec971f;
+}
+
+</style>

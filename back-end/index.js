@@ -17,7 +17,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect(config.mongoURL, { useNewUrlParser: true , useUnifiedTopology: true});   
 
 // Start the server
-let server = app.listen(8081, function () {
+let server = app.listen(8080, function () {
    var host = server.address().address
    var port = server.address().port
    

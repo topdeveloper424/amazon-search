@@ -36,12 +36,12 @@ export default {
     return {
       value: 0,
       max: 100,
-      status:"",
       cancelSource: null,
 
     }
   },
   computed: {
+    status:"",
       ...mapState([
           'lastHistories'
       ])
@@ -51,8 +51,8 @@ export default {
   },  
   methods: {
     chooseFiles: function() {
-          this.status = ""
-          document.getElementById("fileUpload").click()
+      status = ""
+      document.getElementById("fileUpload").click()
     },    
     cancelUpload :function(){
       if (this.cancelSource) {
@@ -67,7 +67,8 @@ export default {
     console.log('onUploadProgress', percentCompleted);
     },
     uploadFile: function(event){
-      this.status = "uploading..."
+      status = "uploading..."
+      this.value = 0
       this.cancelSource = axios.CancelToken.source();
       const formData = new FormData();
       formData.append("file", event.target.files[0]);
@@ -81,7 +82,7 @@ export default {
         })
       .then(res => {
           console.log(res);
-          this.status = "finished"
+          status = "finished"
         })
         .catch(err => {
           console.log(err);

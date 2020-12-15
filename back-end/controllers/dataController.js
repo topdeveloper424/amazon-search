@@ -110,15 +110,57 @@ exports.uploadFile = function (req, res, next) {
 
 exports.getData = async function (req, res, next) {
     console.log('connecting...');
-    const {page = 1, limit = 10} = req.query;
+
+    // getting search queries
+    const {searchTerm, page = 1, per_page = 10, sort="created_at|asc"} = req.query;
+    console.log('searchTerm',searchTerm)
+    
     try{
-        DataSource.paginate({}, { offset: page, limit: limit }).then(result =>{
+        // sort field and mode
+        let sortArr = sort.split("|")
+        let sortField = sortArr[0]
+        let sortMode = sortArr[1]
+
+        // making options for filter
+        let options = {}
+        options['offset'] = page
+        options['limit'] = per_page
+        let sortItem = {}
+        sortItem[sortField] = sortMode
+        options['sort'] = sortItem
+
+        DataSource.paginate({searchTerm: {$regex:  searchTerm, $options: 'i'} }, options).then(result =>{
             console.log(result.totalDocs)
+            // making pagination for vuetable-2
+            let pagination = {}
+            pagination.per_page = result.limit
+            pagination.total = result.totalDocs
+            pagination.current_page = result.offset
+            pagination.last_page = result.totalPages
+            let nextPage = null;
+            let to = result.totalDocs
+            if(result.offset != result.totalPages){
+                nextPage = result.offset + 1
+                to = result.offset * result.limit
+            }
+            let prevPage = null;
+            let from = 1;
+            if(result.offset != 1){
+                prevPage = result.offset - 1
+                from = result.offset * result.limit + 1
+            }
+            result.data = result.docs
+            pagination.from = from
+            pagination.to = to
+            result.docs = null
+
+            pagination.next_page_url = "http://"+req.headers.host+"/data/getData?page="+nextPage
+            pagination.prev_page_url = "http://"+req.headers.host+"/data/getData?page="+prevPage
+            result.pagination =pagination 
+
             res.end(JSON.stringify(result));    
     
         })
-        // const datasources = await DataSource.find().limit(limit * 1).skip((page - 1) * limit).exec()
-        // const count = await datasources.countDocuments();
     
     }catch (err){
         console.log(err);
