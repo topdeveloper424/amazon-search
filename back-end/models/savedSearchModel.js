@@ -7,22 +7,30 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const SavedSearchSchema = new Schema({
-    searchTerms: {
-        type: Boolean,
-        default: true
+    searchTerm: {
+        type: String,
+        default: ''
     },
-    allTitles: {
-        type: Boolean,
-        default: true
+    contextDate: {
+        type: String,
+        default: ''
     },
-    title1: {
-        type: Boolean,
-        default: true
+    targets:{
+        type: String,
+        default: ''
     },
-    asins: {
-        type: Boolean,
-        default: true
-    }
+    trends:{
+        type: String,
+        default: ''
+    },
+    filters:{
+        type: String,
+        default: ''
+    },
+    searchName:{
+        type: String,
+        default: ''
+    },
 
 });
 

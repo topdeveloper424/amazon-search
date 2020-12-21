@@ -2,13 +2,13 @@
   
     <div class="upload-file">
         <p>Data Current to: November, 22 2020</p>
-        <p>Historical Dates missing: Sept 1-7 2020, Sept 15-23 2020, Oct 1-7 2020</p>
+        <p v-if="missingDates.length > 0">Historical Dates missing: <span class="badge badge-secondary mr-2" v-for="missingDate in missingDates" v-bind:key="missingDate.id">{{missingDate}}</span></p>
 
-        <p v-if="lastHistories.length > 0">Last Upload: {{lastHistories[lastHistories.length - 1].recordNumber}} records - {{lastHistories[lastHistories.length - 1].uploadedTime}}</p>
+        <p v-if="lastHistories.length > 0">Last Upload: <span class="badge badge-primary">{{lastHistories[lastHistories.length - 1].recordNumber}} records - {{lastHistories[lastHistories.length - 1].uploadedTime}}</span></p>
         <b-row>
           <b-col>
             <input id="fileUpload" type="file" accept=".xlsx, .xls, .csv" @change="uploadFile" hidden>
-            <b-button size="sm" @click="chooseFiles()">Upload CSV</b-button>
+            <b-button size="sm" @click="chooseFiles()"><b-icon class="mr-1" icon="cloud-upload" aria-hidden="true"></b-icon>Upload CSV</b-button>
           </b-col>
         </b-row>
         
@@ -41,10 +41,11 @@ export default {
     }
   },
   computed: {
-    status:"",
-      ...mapState([
-          'lastHistories'
-      ])
+    status:'',
+    ...mapState([
+        'lastHistories',
+        'missingDates',
+    ])
   },
   mounted() {
     this.$store.dispatch('storeHistory')

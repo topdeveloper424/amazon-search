@@ -6,7 +6,7 @@
     ></vuetable-pagination>
 
   <vuetable ref="vuetable"
-    :api-url="serverURL+'data/getData?searchTerm='+searchTerm"
+    :api-url="serverURL+'data/getData?searchTerm='+searchParams.searchTerm+'&contextDate='+searchParams.contextDate+'&targets='+JSON.stringify(searchParams.targets) +'&trends='+JSON.stringify(searchParams.trends)+'&filters='+JSON.stringify(searchParams.filters)"
     :fields="fields"
     :sort-order="sortOrder"
     :css="css.table"
@@ -16,12 +16,6 @@
     @vuetable:loading="onLoading"        
     @vuetable:loaded="onLoaded"
   >
-    <template slot="actions" slot-scope="props">
-      <div class="table-button-container">
-          <button class="btn btn-warning btn-sm" @click="editRow(props.rowData)">
-            <span class="glyphicon glyphicon-pencil"></span> Edit</button>&nbsp;&nbsp;
-      </div>
-      </template>
 
     </vuetable>
 
@@ -29,6 +23,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Vuetable from "vuetable-2";
 import VuetablePagination from "vuetable-2/src/components/VuetablePagination";
 import axios from "axios";
@@ -41,11 +36,13 @@ export default {
     Vuetable,
     VuetablePagination
   },
-  props:{
-    searchTerm: String
+  computed:{
+    status:'',
+    ...mapState([
+        'searchParams',
+    ])
 
   },
-
   data() {
     return {
       serverURL:Conf.serverURL,
@@ -94,16 +91,6 @@ export default {
     }        
     };
   },
-  mounted(){
-    this.serverURL = Conf.serverURL;
-    console.log(this.searchTerm)
-
-  },
-computed:{
-  /*httpOptions(){
-    return {headers: {'Authorization': "my-token"}} //table props -> :http-options="httpOptions"
-  },*/
- },
  methods: {
     onPaginationData (paginationData) {
       this.$refs.pagination.setPaginationData(paginationData)

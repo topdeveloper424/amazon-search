@@ -11,7 +11,7 @@ const DataSourceSchema = new Schema({
         default: ''
     },
     rank: {
-        type: String,
+        type: Number,
         default: ''
     },
     asin1: {
@@ -23,11 +23,11 @@ const DataSourceSchema = new Schema({
         default: ''
     },
     share1: {
-        type: String,
+        type: Number,
         default: ''
     },
     conv1: {
-        type: String,
+        type: Number,
         default: ''
     },
     asin2: {
@@ -39,11 +39,11 @@ const DataSourceSchema = new Schema({
         default: ''
     },
     share2: {
-        type: String,
+        type: Number,
         default: ''
     },
     conv2: {
-        type: String,
+        type: Number,
         default: ''
     },
     asin3: {
@@ -55,11 +55,11 @@ const DataSourceSchema = new Schema({
         default: ''
     },
     share3: {
-        type: String,
+        type: Number,
         default: ''
     },
     conv3: {
-        type: String,
+        type: Number,
         default: ''
     },
     created_at: {

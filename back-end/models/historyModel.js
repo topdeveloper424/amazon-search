@@ -14,6 +14,10 @@ const HistorySchema = new Schema({
     recordNumber: {
         type: Number,
         default: 0
+    },
+    collectionName: {
+        type: String,
+        default: ''
     }
 
 });
