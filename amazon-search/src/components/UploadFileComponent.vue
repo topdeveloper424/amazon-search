@@ -1,14 +1,14 @@
 <template>
   
     <div class="upload-file">
-        <p>Data Current to: November, 22 2020</p>
+        <p>Data Current to: {{searchParams.contextDate}}</p>
         <p v-if="missingDates.length > 0">Historical Dates missing: <span class="badge badge-secondary mr-2" v-for="missingDate in missingDates" v-bind:key="missingDate.id">{{missingDate}}</span></p>
 
-        <p v-if="lastHistories.length > 0">Last Upload: <span class="badge badge-primary">{{lastHistories[lastHistories.length - 1].recordNumber}} records - {{lastHistories[lastHistories.length - 1].uploadedTime}}</span></p>
+        <p v-if="lastHistories.length > 0">Last Upload: <span class="badge badge-primary"> {{lastHistories[lastHistories.length - 1]}}</span></p>
         <b-row>
           <b-col>
             <input id="fileUpload" type="file" accept=".xlsx, .xls, .csv" @change="uploadFile" hidden>
-            <b-button size="sm" @click="chooseFiles()"><b-icon class="mr-1" icon="cloud-upload" aria-hidden="true"></b-icon>Upload CSV</b-button>
+            <b-button size="sm" @click="chooseFiles()"><b-icon class="mr-1" icon="cloud-upload" aria-hidden="true" :disabled="value!=0"></b-icon>Upload CSV</b-button>
           </b-col>
         </b-row>
         
@@ -37,14 +37,15 @@ export default {
       value: 0,
       max: 100,
       cancelSource: null,
+      status:'',
 
     }
   },
   computed: {
-    status:'',
     ...mapState([
         'lastHistories',
         'missingDates',
+        'searchParams'
     ])
   },
   mounted() {
@@ -52,7 +53,7 @@ export default {
   },  
   methods: {
     chooseFiles: function() {
-      status = ""
+      this.status = "ready to upload"
       document.getElementById("fileUpload").click()
     },    
     cancelUpload :function(){
@@ -68,7 +69,7 @@ export default {
     console.log('onUploadProgress', percentCompleted);
     },
     uploadFile: function(event){
-      status = "uploading..."
+      this.status = "uploading..."
       this.value = 0
       this.cancelSource = axios.CancelToken.source();
       const formData = new FormData();
@@ -83,7 +84,15 @@ export default {
         })
       .then(res => {
           console.log(res);
-          status = "finished"
+          this.status = "finished"
+          setTimeout(() => {
+            this.status = "ready to upload"; 
+            this.value = 0;
+            let date = new Date();
+            let dateStr = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate() +" "+date.getHours() + ":"+date.getMinutes() + ":"+date.getSeconds()
+ 
+            this.$store.dispatch('insertHistory', dateStr)
+            }, 2000);
         })
         .catch(err => {
           console.log(err);

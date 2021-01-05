@@ -1,13 +1,10 @@
-let today = new Date()
-let dateStr = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
-
 export default {
     lastHistories : [],
     missingDates: [],
     savedSearches:[],
     searchParams: {
         searchTerm: '',
-        contextDate: dateStr,
+        contextDate: '',
         targets:{
             searchTermChecked: 1,
     

@@ -13,7 +13,12 @@ exports.getLastHistory = function (req, res, next) {
         if(err){
             console.log(err)
         }else{
-            res.end(JSON.stringify(history))
+            let result = history
+            let date = new Date(history.uploadedTime);
+            let dateStr = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate() +" "+date.getHours() + ":"+date.getMinutes() + ":"+date.getSeconds()
+            result.lastDate  =dateStr;
+
+            res.end(dateStr)
         }
     });
 

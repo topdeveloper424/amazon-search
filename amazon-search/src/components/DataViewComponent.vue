@@ -21,6 +21,14 @@
 
 	</div>
 </template>
+<style lang="scss">
+  .vuetable-body .vuetable-td-title1, .vuetable-body .vuetable-td-title2, .vuetable-body .vuetable-td-title3{
+     max-width: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;    
+  }
+</style>
 
 <script>
 import { mapState } from 'vuex'
@@ -47,20 +55,20 @@ export default {
     return {
       serverURL:Conf.serverURL,
       fields: [
-          { name: 'searchTerm', title: 'Search Term',sortField:'searchTerm', titleClass: 'center aligned' },
-          { name: 'rank', title: 'Rank', sortField:'Rank', titleClass: 'center aligned'},
-          { name: 'asin1', title: 'ASIN #1', sortField:'asin1', titleClass: 'center aligned'},
+          { name: 'searchTerm', title: 'Search Term',sortField:'searchTerm', titleClass: 'center aligned' ,width: '15%'},
+          { name: 'rank', title: 'Rank', sortField:'Rank', titleClass: 'center aligned',width: '3%'},
+          { name: 'asin1', title: 'ASIN #1', sortField:'asin1', titleClass: 'center aligned',width: '5%'},
           { name: 'title1', title: 'Title', sortField:'title1', titleClass: 'center aligned'},
-          { name: 'share1', title: 'Share', sortField:'share1', titleClass: 'center aligned'},
-          { name: 'conv1', title: 'Conv', sortField:'conv1', titleClass: 'center aligned'},
-          { name: 'asin2', title: 'ASIN #2', sortField:'asin2', titleClass: 'center aligned'},
+          { name: 'share1', title: 'Share', sortField:'share1', titleClass: 'center aligned',width: '5%'},
+          { name: 'conv1', title: 'Conv', sortField:'conv1', titleClass: 'center aligned',width: '5%'},
+          { name: 'asin2', title: 'ASIN #2', sortField:'asin2', titleClass: 'center aligned',width: '5%'},
           { name: 'title2', title: 'Title', sortField:'title2', titleClass: 'center aligned'},
-          { name: 'share2', title: 'Share', sortField:'share2', titleClass: 'center aligned'},
-          { name: 'conv2', title: 'Conv', sortField:'conv2', titleClass: 'center aligned'},
-          { name: 'asin3', title: 'ASIN #3', sortField:'asin3', titleClass: 'center aligned'},
+          { name: 'share2', title: 'Share', sortField:'share2', titleClass: 'center aligned',width: '5%'},
+          { name: 'conv2', title: 'Conv', sortField:'conv2', titleClass: 'center aligned',width: '5%'},
+          { name: 'asin3', title: 'ASIN #3', sortField:'asin3', titleClass: 'center aligned',width: '5%'},
           { name: 'title3', title: 'Title', sortField:'title3', titleClass: 'center aligned'},
-          { name: 'share3', title: 'Share', sortField:'share3', titleClass: 'center aligned'},
-          { name: 'conv3', title: 'Conv', sortField:'conv3', titleClass: 'center aligned'},
+          { name: 'share3', title: 'Share', sortField:'share3', titleClass: 'center aligned',width: '5%'},
+          { name: 'conv3', title: 'Conv', sortField:'conv3', titleClass: 'center aligned',width: '5%'},
           '__slot:actions'
         ],
     sortOrder: [

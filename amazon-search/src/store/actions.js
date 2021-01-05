@@ -13,13 +13,19 @@ export default {
         } catch (e) {
         }
     },
+    insertHistory({commit}, payload){
+        commit(types.SAVE_LAST_HISTORY, payload)
+    },
+
     async saveMissingDates({ commit }, payload) {
         try {
             const {data} = await axios.get(Conf.serverURL + 'data/getMissingDates')
             console.log("data",data)
-            if(data.length > 0){
-                commit(types.SAVE_MISSING_DATES, data)
+            if(data.missinDateArray.length > 0){
+                commit(types.SAVE_MISSING_DATES, data.missinDateArray)
             }
+            commit(types.SAVE_CONTEXT_DATE, data.contextDate)
+
         } catch (e) {
         }
     },
@@ -51,7 +57,6 @@ export default {
     getSearchById({ commit }, payload) {
         return axios.post(Conf.serverURL + 'search/getSearchById', payload).then(res=>{
             let data = res.data
-            console.log(data)
             commit(types.UDPATE_SEARCH_PARAMS, data)
         }).then(err => {
             if(err){

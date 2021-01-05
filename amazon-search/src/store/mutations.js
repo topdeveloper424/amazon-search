@@ -7,17 +7,20 @@ export default {
     [types.SAVE_MISSING_DATES](state, payload) {
         state.missingDates = payload
     },
+    [types.SAVE_CONTEXT_DATE](state, payload) {
+        state.searchParams.contextDate = payload
+    },
     [types.UDPATE_SEARCH_PARAMS](state, payload) {
-        if(typeof payload._id === "undefined"){
+        if(typeof payload._id === 'undefined'){
             state.searchParams = payload
         }else{
+            console.log(payload)
             state.searchParams.searchTerm = payload.searchTerm
             state.searchParams.contextDate = payload.contextDate
-            state.searchParams.targets = JSON.parse(payload.targets)
-            state.searchParams.targets = JSON.parse(payload.targets)
+                        
+            state.searchParams.targets =JSON.parse(payload.targets)
             state.searchParams.trends = JSON.parse(payload.trends)
             state.searchParams.filters = JSON.parse(payload.filters)
-
         }
     },
     [types.SAVE_SAVED_SEARCHES](state, payload) {

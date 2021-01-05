@@ -110,13 +110,6 @@ exports.uploadFile = async function (req, res, next) {
                     history.save();
     
                     // remove file after insert data
-                    try {
-                        fs.unlinkSync(uploadFilePath)
-                        //file removed
-                      } catch(err) {
-                        console.error(err)
-                      }                
-                    res.sendStatus(200);
     
                       console.log('CSV file successfully processed');
                 });
@@ -124,7 +117,18 @@ exports.uploadFile = async function (req, res, next) {
 
             }
 
+        }).on('finish', ()=>{
+            try {
+                fs.unlinkSync(uploadFilePath)
+                //file removed
+              } catch(err) {
+                console.error(err)
+              }                
+            res.sendStatus(200);
+
         });
+
+
 
 
     });
@@ -190,21 +194,24 @@ exports.getData = async function (req, res, next) {
                     let lastPos = searchTerm.indexOf('"', pos + 2)
                     if(lastPos != -1){
                         let exactStr = searchTerm.substring(pos+1, lastPos);
+                        exactStr = exactStr.trim()
                         console.log("exact exclude",exactStr)
                         searchMatcher = {$regex: new RegExp("^((?!.*"+exactStr+".*).)*$")}
                     }else{
                         searchMatcher = {$regex:  searchTerm, $options: 'i'}
                     }
-                }else if(searchTerm.indexOf("-") !== -1){
-                    let pos = searchTerm.indexOf("-")
-                    let lastPos = searchTerm.indexOf(" ", pos+2)
+                }else if(searchTerm.indexOf("- ") !== -1){
+                    let pos = searchTerm.indexOf("- ")
+                    let lastPos = searchTerm.indexOf(" ", pos+3)
                     if(lastPos != -1){
-                        let exactStr = searchTerm.substring(pos+1, lastPos);
+                        let exactStr = searchTerm.substring(pos+2, lastPos);
+                        exactStr = exactStr.trim()
                         searchMatcher = {$regex: new RegExp("^((?!.*"+exactStr+".*).)*$")}
                         
                         console.log("exclude that word",exactStr)
                     }else{
                         let exactStr = searchTerm.substring(pos+1);
+                        exactStr = exactStr.trim()
                         searchMatcher = {$regex: new RegExp("^((?!.*"+exactStr+".*).)*$")}
                         console.log("exclude that word",exactStr)
                     }
@@ -213,6 +220,7 @@ exports.getData = async function (req, res, next) {
                     let lastPos= searchTerm.indexOf('"', pos + 1)
                     if(lastPos !== -1){
                         let exactStr = searchTerm.substring(pos+1, lastPos);
+                        exactStr = exactStr.trim()
                         console.log("exact include",exactStr)
                         searchMatcher = {$regex: exactStr}
                     }else{
@@ -242,15 +250,15 @@ exports.getData = async function (req, res, next) {
                     let avgAllShareComp = null;
                     let convAllShareComp = null;
                     if(Number(targetsJson.allClickSelect) == 0){
-                        avgAllShareComp = { $gte: Number(targetsJson.allClickNumber)*3 }
+                        avgAllShareComp = { $gte: Number(targetsJson.allClickNumber) }
                     }else{
-                        avgAllShareComp = { $lte: Number(targetsJson.allClickNumber)*3 }
+                        avgAllShareComp = { $lte: Number(targetsJson.allClickNumber) }
                     }
     
                     if(Number(targetsJson.allConvSelect) == 0){
-                        convAllShareComp = { $gte: Number(targetsJson.allConvNumber)*3 }
+                        convAllShareComp = { $gte: Number(targetsJson.allConvNumber) }
                     }else{
-                        convAllShareComp = { $lte: Number(targetsJson.allConvNumber)*3 }
+                        convAllShareComp = { $lte: Number(targetsJson.allConvNumber) }
                     }
                     myAggreate.push({ $addFields: { 
                         avgShare: { $sum:["$share1", "$share2", "$share3"]} ,
@@ -267,6 +275,7 @@ exports.getData = async function (req, res, next) {
                 if(Number(targetsJson.titleChecked) == 1){
                     let avgShareComp = null;
                     let convShareComp = null;
+                    console.log("Number(targetsJson.clickNumber)",parseFloat(targetsJson.clickNumber))
                     if(Number(targetsJson.clickSelect) == 0){
                         avgShareComp = { $gte: Number(targetsJson.clickNumber) }
                     }else{
@@ -325,6 +334,7 @@ exports.getData = async function (req, res, next) {
                 }
 
                 let aggreate = DataSource.aggregate(myAggreate)
+                console.log("myAggreate",myAggreate)
 
                 await DataSource.aggregatePaginate(aggreate, options).then(result =>{
                     // making pagination for vuetable-2
@@ -366,7 +376,6 @@ exports.getData = async function (req, res, next) {
 
     }
     res.end();    
-
 };
 
 // get missing dates for current year
@@ -374,37 +383,52 @@ exports.getMissingDates = async function (req, res, next) {
     console.log('connecting...');
     let collections = await mongoose.connection.db.listCollections({name: {$regex:  "datasource@", $options: 'i'}}).toArray()
 
-    //get all mondays for this year
-    let allMondays = getMondays();
-    console.log("allMondays",allMondays)
+    //get all Sundays for this year
+    let allSundays = getSundays();
 
+    let collectioNamesArray = []
     // making array of start dates from all collection names
     for(let i = 0; i < collections.length; i ++){
         let colName = collections[i].name
         colName = colName.replace("datasource@", "")
         let colArr = colName.split("-")
-        let startDateArr = colArr[0].split("_")
-        let startDate = new Date(Number("20"+startDateArr[2]), Number(startDateArr[0]) - 1, Number(startDateArr[1]))
-        let index = allMondays.indexOf(startDate.getTime());
-        if (index > -1) {
-            allMondays.splice(index, 1);
+        let startDate = colArr[0]
+        let startDateArr = startDate.split("_")
+        let startTemp = startDateArr[0]+"_"+startDateArr[1]+"_20"+startDateArr[2];
+        let dayStr = startDateArr[1]
+        if(dayStr.length == 1){
+            dayStr = "0"+dayStr; 
+        }
+        collectioNamesArray.push("20"+startDateArr[2]+"-"+startDateArr[0]+"-"+dayStr)
+        let index = allSundays.indexOf(startTemp);
+        if (index !== -1) {
+            allSundays.splice(index, 1);
         }
     }
+    collectioNamesArray.sort()
+    console.log("collectioNamesArray",collectioNamesArray)
 
 
-    // check missing start date using all mondays
+    // check missing start date using all Sundays
     let missinDateArray = []
-    if(allMondays.length > 1){
-        for(let i = 0; i < allMondays.length - 1; i++ ){
-            let element = allMondays[i];
-            let elementStart = new Date(element)
-            let elementEnd = new Date(element)
+    if(allSundays.length > 1){
+        for(let i = 0; i < allSundays.length - 1; i++ ){
+            let element = allSundays[i].split("_");
+            let elementStart = new Date(Number(element[2]), Number(element[0])-1, Number(element[1]))
+            let elementEnd = new Date(elementStart.getTime())
             elementEnd.setDate(elementStart.getDate()+6)
             missinDateArray.push(formatDate(elementStart)+" ~ " + formatDate(elementEnd))
         }
     }
+    if(collectioNamesArray.length > 0){
+        res.end(JSON.stringify({"missinDateArray":missinDateArray, "contextDate":collectioNamesArray[collectioNamesArray.length-1]}));
+    }else{
+        let today = new Date()
+        let dateStr = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
+        
+        res.end(JSON.stringify({"missinDateArray":missinDateArray, "contextDate":dateStr}));
+    }
 
-    res.end(JSON.stringify(missinDateArray));
 };
 
 
@@ -431,40 +455,41 @@ function formatDate(date) {
     return [year, month, day].join('-');
 }
 
-function getMondays() {
-    mondays = [];
+function getSundays() {
+    Sundays = [];
     var today = new Date();
-    var thisMonday = getMonday(new Date()).getTime()
+    var thisSunday = getSunday(new Date()).getTime()
 
 
     for(let i = 0; i <= today.getMonth(); i ++){
         var d = new Date();
         d.setMonth(i)
-        d.setDate(1);
+        d.setDate(0);
     
-        // Get the first Monday in the month
-        while (d.getDay() !== 1) {
+        // Get the first Sunday in the month
+        while (d.getDay() !== 0) {
             d.setDate(d.getDate() + 1);
         }
     
-        // Get all the other Mondays in the month
+        // Get all the other Sundays in the month
         while (d.getMonth() === i) {
-            if(d.getTime() == thisMonday){
+            if(d.getTime() == thisSunday){
                 break
             }
-            mondays.push(new Date(d.getTime()));
+            let tempMonth = d.getMonth() + 1; 
+            let tempDate = tempMonth +  "_" + d.getDate() + "_" + d.getFullYear();
+            Sundays.push(tempDate);
             d.setDate(d.getDate() + 7);
         }
     
     }
 
 
-    return mondays;
+    return Sundays;
 }
 
-function getMonday(d) {
-    d = new Date(d);
-    var day = d.getDay(),
-        diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
-    return new Date(d.setDate(diff));
+function getSunday(dInput) {
+    var d = new Date(dInput.getTime());
+    d.setDate(d.getDate() - d.getDay());
+    return d;
   }

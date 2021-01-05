@@ -5,7 +5,7 @@
           <label class="mt-1 mb-sm-0" for="inline-form-input-name">Date Context:</label>
       </b-col>
       <b-col cols="4" class="text-left">
-          <b-form-datepicker id="contextDatepicker" size="sm" v-model="contextDate" class="mb-2"></b-form-datepicker>
+          <b-form-datepicker id="contextDatepicker" size="sm" v-model="searchParams.contextDate" class="mb-2"></b-form-datepicker>
       </b-col>
     </b-row>
     <b-row class="mt-3">
@@ -14,7 +14,7 @@
           <b-input-group-prepend is-text >
             <b-icon icon="search" ></b-icon>
           </b-input-group-prepend>
-          <b-form-input v-model="searchTerm" id="searchTerm" placeholder="Search terms"></b-form-input>
+          <b-form-input v-model="searchTerm" id="searchTerm" placeholder="Search terms" v-on:keyup.enter="search"></b-form-input>
         </b-input-group>
       </b-col>
       <b-col cols="2" class="text-left">
@@ -424,14 +424,11 @@ export default {
     ])
   },
   data() {
-    let today = new Date()
-    let dateStr = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
     return {
         currentSearch:'',
         nameState: null,
         searchName: '',      
         searchTerm: '',
-        contextDate: dateStr,
         targets:{
             searchTermChecked: 1,
     
@@ -484,6 +481,9 @@ export default {
         }
     }
   },
+  mounted(){
+    this.contextDate = this.$store.state.searchParams.contextDate;
+  },
   methods: {
     async changeSearch(){
       console.log("currentSearch",this.currentSearch)
@@ -491,9 +491,9 @@ export default {
         "id": this.currentSearch
       }
       await this.$store.dispatch('getSearchById', params)
+      
       let updateSearchParams = this.$store.state.searchParams;
       this.searchTerm = updateSearchParams.searchTerm;
-      this.contextDate = updateSearchParams.contextDate;
       this.targets = updateSearchParams.targets;
       this.trends = updateSearchParams.trends;
       this.filters = updateSearchParams.filters;
@@ -501,9 +501,9 @@ export default {
       console.log("finished dispatch")
     },
     search(){
+      console.log("search")
       let updateSearchParams = this.$store.state.searchParams;
       updateSearchParams.searchTerm = this.searchTerm;
-      updateSearchParams.contextDate = this.contextDate;
       updateSearchParams.targets = this.targets;
       updateSearchParams.trends = this.trends;
       updateSearchParams.filters = this.filters;
