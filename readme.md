@@ -8,7 +8,7 @@
   [![Windows Build][appveyor-image]][appveyor-url]
   [![Test Coverage][coveralls-image]][coveralls-url]
 
-## Installation
+## Installation for back-end (express.js)
 
 This is a [Node.js](https://nodejs.org/en/) module available through the
 [npm registry](https://www.npmjs.com/).
@@ -25,58 +25,52 @@ Installation is done using the
 ```bash
 $ npm install
 ```
+configurations ( config.js):
+``` js
+    mongoURL: 'mongodb://localhost:27017/amazon_db',  //Remote mongodb url
+    batchNumber: 500 // batch insert number for importing excel rows
+```
+how to run:
+```bash
+$ npm start
+```
 
 Follow [our installing guide](http://expressjs.com/en/starter/installing.html)
 for more information.
 
-## Features
+### Features
 
-  * Robust routing
-  * Focus on high performance
-  * Super-high test coverage
-  * HTTP helpers (redirection, caching, etc)
-  * View system supporting 14+ template engines
-  * Content negotiation
-  * Executable for generating applications quickly
+  * User Authentication
+  * Search Data from Mongodb
+  * Saved search
+  * history of Uploading
 
-## Docs & Community
+### Database models
+  * Datasource
+  * History
+  * SavedSearch
 
-  * [Website and Documentation](http://expressjs.com/) - [[website repo](https://github.com/expressjs/expressjs.com)]
-  * [#express](https://webchat.freenode.net/?channels=express) on freenode IRC
-  * [GitHub Organization](https://github.com/expressjs) for Official Middleware & Modules
-  * Visit the [Wiki](https://github.com/expressjs/express/wiki)
-  * [Google Group](https://groups.google.com/group/express-js) for discussion
-  * [Gitter](https://gitter.im/expressjs/express) for support and discussion
+### Collection Name format
+datasource collection is named in following format:
+ex:  datasource@11_22_20-11_28_20
+datasource@[start date]-[end date]
+start and end date are provided from excel file
 
-**PROTIP** Be sure to read [Migrating from 3.x to 4.x](https://github.com/expressjs/express/wiki/Migrating-from-3.x-to-4.x) as well as [New features in 4.x](https://github.com/expressjs/express/wiki/New-features-in-4.x).
 
-### Security Issues
+## Front-end(Vue.js)
 
-If you discover a security vulnerability in Express, please see [Security Policies and Procedures](Security.md).
+Installation is done using the
+[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
 
-## Contributing
+```bash
+$ npm install
+```
+how to run:
+```bash
+$ npm run serve
+```
 
-[Contributing Guide](Contributing.md)
-
-## People
-
-The original author of Express is [TJ Holowaychuk](https://github.com/tj)
-
-The current lead maintainer is [Douglas Christopher Wilson](https://github.com/dougwilson)
-
-[List of all contributors](https://github.com/expressjs/express/graphs/contributors)
-
-## License
-
-  [MIT](LICENSE)
-
-[npm-image]: https://img.shields.io/npm/v/express.svg
-[npm-url]: https://npmjs.org/package/express
-[downloads-image]: https://img.shields.io/npm/dm/express.svg
-[downloads-url]: https://npmcharts.com/compare/express?minimal=true
-[travis-image]: https://img.shields.io/travis/expressjs/express/master.svg?label=linux
-[travis-url]: https://travis-ci.org/expressjs/express
-[appveyor-image]: https://img.shields.io/appveyor/ci/dougwilson/express/master.svg?label=windows
-[appveyor-url]: https://ci.appveyor.com/project/dougwilson/express
-[coveralls-image]: https://img.shields.io/coveralls/expressjs/express/master.svg
-[coveralls-url]: https://coveralls.io/r/expressjs/express?branch=master
+configuration(config.js)
+```js
+serverURL : 'http://localhost:8080/'  // back-end url
+```

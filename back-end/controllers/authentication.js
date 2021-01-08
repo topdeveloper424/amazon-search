@@ -3,6 +3,8 @@
 //= =======================================
 // Login Route
 //= =======================================
+
+// user authentication:  username: admin, userpassword: admin
 exports.login = function (req, res, next) {
     console.log('connecting...');
     let username  = req.body.username;

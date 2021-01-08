@@ -3,6 +3,7 @@ import { LayoutPlugin } from 'bootstrap-vue';
 import {Conf} from './../../config'
 
 export default {
+    // get pagination date for table 
      getPageData : async (state)=> {
         try {
             const data = await axios.get(Conf.serverURL + 'data/getData')
@@ -12,6 +13,8 @@ export default {
         }
     },
 
+
+    // authenticate user
     login : (state)=> async (payload) =>{
         try {
             const {username, password} = payload;

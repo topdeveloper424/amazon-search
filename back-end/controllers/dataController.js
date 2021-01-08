@@ -19,7 +19,7 @@ DataSourceSchema.plugin(aggregatePaginate)
 const History = mongoose.model('History', HistorySchema);
 
 
-
+// upload file part
 exports.uploadFile = async function (req, res, next) {
     req.pipe(req.busboy); // Pipe it trough busboy
 
@@ -43,6 +43,7 @@ exports.uploadFile = async function (req, res, next) {
         fstream.on('close', async () => {
             console.log(`Upload of '${filename}' finished`);
 
+            // reading date information from CSV
             let firstRow = await firstLine(uploadFilePath)
             let headers = firstRow.split(",")
             let period = headers[4]
@@ -52,6 +53,8 @@ exports.uploadFile = async function (req, res, next) {
             period = period.replace(/ /g,"")
             period = period.replace(/\//g, "_")
             let collectionName = "datasource@"+period
+
+            // finding collection names with generated name
             let collinfo = await mongoose.connection.db.listCollections({name: collectionName}).toArray()
             if(collinfo.length === 0){
                 var DataSource = mongoose.model(collectionName, DataSourceSchema)
@@ -62,6 +65,8 @@ exports.uploadFile = async function (req, res, next) {
                     if(isNaN(row[2]) == false){
                         rankNum = Number(row[2].trim())
                     }
+
+                    // storing one row into db
                     let data = {
                         searchTerm: row[1],
                         rank: rankNum,
@@ -135,6 +140,7 @@ exports.uploadFile = async function (req, res, next) {
 
 };
 
+// getting table pagination data 
 exports.getData = async function (req, res, next) {
     console.log('connecting...');
 
@@ -145,8 +151,7 @@ exports.getData = async function (req, res, next) {
         return
     }
 
-    // console.log('searchTerm',searchTerm)
-    // console.log('contextDate',contextDate)
+    // parsing filtering query
     var targetsJson = JSON.parse(targets)
     var trendsJson = JSON.parse(trends)
     var filtersJson = JSON.parse(filters)
@@ -160,6 +165,8 @@ exports.getData = async function (req, res, next) {
     for(let i = 0; i < collections.length; i ++){
         let collection = collections[i];
         let colName = collection.name
+
+        // determine start and end date of collection
         colName = colName.replace("datasource@", "")
         let colArr = colName.split("-")
         let startDateArr = colArr[0].split("_")
@@ -167,7 +174,6 @@ exports.getData = async function (req, res, next) {
 
         let startDate = new Date(Number("20"+startDateArr[2]), Number(startDateArr[0])-1, Number(startDateArr[1]))
         let endDate = new Date(Number("20"+endDateArr[2]), Number(endDateArr[0])-1, Number(endDateArr[1]))
-
 
         if(startDate <= contextDateObj && endDate >= contextDateObj){
             const DataSource = await mongoose.model(collection.name, DataSourceSchema);
@@ -190,6 +196,8 @@ exports.getData = async function (req, res, next) {
 
                 // making matches for exact matches 
                 if(searchTerm.indexOf('-"') !== -1){
+
+                    // making regular expression for exact exclude
                     let pos = searchTerm.indexOf('-"');
                     let lastPos = searchTerm.indexOf('"', pos + 2)
                     if(lastPos != -1){
@@ -201,6 +209,7 @@ exports.getData = async function (req, res, next) {
                         searchMatcher = {$regex:  searchTerm, $options: 'i'}
                     }
                 }else if(searchTerm.indexOf("- ") !== -1){
+                    // making regular expression for exact exclude word
                     let pos = searchTerm.indexOf("- ")
                     let lastPos = searchTerm.indexOf(" ", pos+3)
                     if(lastPos != -1){
@@ -216,6 +225,7 @@ exports.getData = async function (req, res, next) {
                         console.log("exclude that word",exactStr)
                     }
                 }else if(searchTerm.indexOf('"') !== -1){
+                    // making regular expression for exact include
                     let pos = searchTerm.indexOf('"')
                     let lastPos= searchTerm.indexOf('"', pos + 1)
                     if(lastPos !== -1){
@@ -232,13 +242,13 @@ exports.getData = async function (req, res, next) {
 
                 let matchFields = null;
 
+                // making aggreation for filtering
+
                 if(Number(targetsJson.searchTermChecked) == 0 && Number(targetsJson.asinChecked) == 1){
                     matchFields = {asin1: searchMatcher}
                 }else{
                     matchFields = {searchTerm: searchMatcher}
                 }
-
-
 
                 var myAggreate = [
                     { $match: matchFields }
@@ -275,8 +285,7 @@ exports.getData = async function (req, res, next) {
                 if(Number(targetsJson.titleChecked) == 1){
                     let avgShareComp = null;
                     let convShareComp = null;
-                    console.log("Number(targetsJson.clickNumber)",parseFloat(targetsJson.clickNumber))
-                    if(Number(targetsJson.clickSelect) == 0){
+0                    if(Number(targetsJson.clickSelect) == 0){
                         avgShareComp = { $gte: Number(targetsJson.clickNumber) }
                     }else{
                         avgShareComp = { $lte: Number(targetsJson.clickNumber) }
@@ -334,8 +343,8 @@ exports.getData = async function (req, res, next) {
                 }
 
                 let aggreate = DataSource.aggregate(myAggreate)
-                console.log("myAggreate",myAggreate)
 
+                // processing with aggregation
                 await DataSource.aggregatePaginate(aggreate, options).then(result =>{
                     // making pagination for vuetable-2
                     let pagination = {}
@@ -406,8 +415,6 @@ exports.getMissingDates = async function (req, res, next) {
         }
     }
     collectioNamesArray.sort()
-    console.log("collectioNamesArray",collectioNamesArray)
-
 
     // check missing start date using all Sundays
     let missinDateArray = []
@@ -420,6 +427,7 @@ exports.getMissingDates = async function (req, res, next) {
             missinDateArray.push(formatDate(elementStart)+" ~ " + formatDate(elementEnd))
         }
     }
+
     if(collectioNamesArray.length > 0){
         res.end(JSON.stringify({"missinDateArray":missinDateArray, "contextDate":collectioNamesArray[collectioNamesArray.length-1]}));
     }else{
@@ -432,6 +440,7 @@ exports.getMissingDates = async function (req, res, next) {
 };
 
 
+// convert string to number
 function convertNum(str){
     temp = str.replace("%","")
     temp = temp.trim()
@@ -442,6 +451,8 @@ function convertNum(str){
     }
     
 }
+
+// make formatted date String 
 function formatDate(date) {
         month = '' + (date.getMonth() + 1),
         day = '' + date.getDate(),
@@ -455,6 +466,7 @@ function formatDate(date) {
     return [year, month, day].join('-');
 }
 
+// get all sundays in this year
 function getSundays() {
     Sundays = [];
     var today = new Date();
@@ -488,6 +500,7 @@ function getSundays() {
     return Sundays;
 }
 
+// getting sunday this week
 function getSunday(dInput) {
     var d = new Date(dInput.getTime());
     d.setDate(d.getDate() - d.getDay());

@@ -485,8 +485,8 @@ export default {
     this.contextDate = this.$store.state.searchParams.contextDate;
   },
   methods: {
+    // change search parameters by selected search
     async changeSearch(){
-      console.log("currentSearch",this.currentSearch)
       let params = {
         "id": this.currentSearch
       }
@@ -497,11 +497,9 @@ export default {
       this.targets = updateSearchParams.targets;
       this.trends = updateSearchParams.trends;
       this.filters = updateSearchParams.filters;
-
-      console.log("finished dispatch")
     },
+    // search data
     search(){
-      console.log("search")
       let updateSearchParams = this.$store.state.searchParams;
       updateSearchParams.searchTerm = this.searchTerm;
       updateSearchParams.targets = this.targets;
@@ -509,6 +507,7 @@ export default {
       updateSearchParams.filters = this.filters;
       this.$store.dispatch('updateSearchParams', updateSearchParams)
     },
+    // delete current selected search
     async deleteSearch(){
       if(this.currentSearch.trim() === ""){
         this.$bvModal.msgBoxOk('Please select search to delete!')
@@ -539,6 +538,8 @@ export default {
 
       }
     },
+
+    // update the current search parameters
     async updateSearch(){
       if(this.currentSearch.trim() === ""){
         this.$bvModal.msgBoxOk('Please select search to update!')

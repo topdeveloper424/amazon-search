@@ -48,6 +48,7 @@ export default {
         'searchParams'
     ])
   },
+  // display latest history
   mounted() {
     this.$store.dispatch('storeHistory')
   },  

@@ -4,6 +4,7 @@ import axios from 'axios'
 
 export default {
 
+    // getting latest history and store in state
     async storeHistory({ commit }, payload) {
         try {
             const {data} = await axios.get(Conf.serverURL + 'history/getLastHistory')
@@ -17,6 +18,7 @@ export default {
         commit(types.SAVE_LAST_HISTORY, payload)
     },
 
+    // getting missing dates from back-end and store in states
     async saveMissingDates({ commit }, payload) {
         try {
             const {data} = await axios.get(Conf.serverURL + 'data/getMissingDates')
@@ -30,10 +32,12 @@ export default {
         }
     },
 
+    // update search parameters in states
     updateSearchParams({commit}, payload){
         commit(types.UDPATE_SEARCH_PARAMS, payload)
     },
 
+    // save current search parameters from states and send to back-end
     async saveSearch({commit}, payload){
         try {
             const {data} = await axios.post(Conf.serverURL + 'search/saveSearch', payload)
@@ -44,6 +48,7 @@ export default {
 
     },
     
+    // getting all search names from back-end and store in states
     async getSearchNames({ commit }, payload) {
         try {
             const {data} = await axios.get(Conf.serverURL + 'search/getSearchNames')
@@ -54,6 +59,7 @@ export default {
         }
     },
 
+    // get search details by search Id and save that as current search parameters
     getSearchById({ commit }, payload) {
         return axios.post(Conf.serverURL + 'search/getSearchById', payload).then(res=>{
             let data = res.data
@@ -65,6 +71,7 @@ export default {
         });
     },
 
+    // delete search by search ID 
     deleteSearchById({ commit }, payload) {
         return axios.post(Conf.serverURL + 'search/deleteSearchById', payload).then(res=>{
             commit(types.DELETE_SAVED_SEARCH, payload)
@@ -75,8 +82,8 @@ export default {
         });
     },
 
+    // update search details by ID
     updateSearchById({ commit }, payload) {
-
         return axios.post(Conf.serverURL + 'search/updateSearchById', payload).then(res=>{
         }).then(err => {
             if(err){

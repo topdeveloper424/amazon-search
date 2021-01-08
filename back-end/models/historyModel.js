@@ -1,5 +1,5 @@
 //= =======================================
-// Model for save search
+// Model for uploaded history
 //= =======================================
 
 const mongoose = require('mongoose');
